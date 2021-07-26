@@ -92,6 +92,10 @@ process EASEL_INFO {
       
      shell:
      '''
+     ### CDM added. Replace clustal output headers with one acceptable to esl-alistat
+     sed -i '1 s/^CLUSTAL.*$/CLUSTAL FORMAT for T-COFFEE multiple sequence alignment/' !{test_alignment}
+     ###
+
      esl-alistat !{test_alignment} > !{id}.!{align_type}.!{bucket_size}.!{align_method}.with.!{tree_method}.tree.easel_INFO
      awk -F : '{ if (\$1=="Average length") printf "%s", \$2}' !{id}.!{align_type}.!{bucket_size}.!{align_method}.with.!{tree_method}.tree.easel_INFO | sed 's/ //g' > !{id}.!{align_type}.!{bucket_size}.!{align_method}.with.!{tree_method}.tree.avgLen 
      awk -F : '{ if (\$1=="Average identity") printf "%s", substr(\$2, 1, length(\$2)-1)}' !{id}.!{align_type}.!{bucket_size}.!{align_method}.with.!{tree_method}.tree.easel_INFO | sed 's/ //g' > !{id}.!{align_type}.!{bucket_size}.!{align_method}.with.!{tree_method}.tree.avgId 
@@ -233,7 +237,17 @@ for sequence in record:
     ## print(sequence.seq)
     auxGap = sequence.seq.count(gap)
     globalGap += auxGap
-avgGap = Decimal(globalGap) / Decimal(len(record))
+
+### CDM added try
+try:
+    avgGap = Decimal(globalGap) / Decimal(len(record))
+except Exception as E: # CDM added
+    record = list(SeqIO.parse("${test_alignment}", "clustal"))
+    for sequence in record:
+       auxGap = sequence.seq.count(gap)
+       globalGap += auxGap
+       avgGap = Decimal(globalGap) / Decimal(len(record))
+
 print "NumSeq: ",len(record)," GlobalGap: ",globalGap," AVG_Gap:",round(avgGap,3)
 totGapFile.write(str(globalGap))
 alnLenFile.write(str(len(record[0])))

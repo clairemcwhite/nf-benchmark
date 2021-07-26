@@ -15,7 +15,7 @@ include {   EVAL_ALIGNMENT as EVAL_CLUSTALO ;
 workflow EVALUATION {
     take:
         refs_ch
-        aligmentFile
+        alignmentFile
         flavour
         align_method
         tree_method
@@ -23,9 +23,19 @@ workflow EVALUATION {
 
     main:
         refs_ch
-            .cross (aligmentFile)
+            .cross (alignmentFile)
             .map { it -> [ it[1][0], it[1][1], it[0][1] ] }
             .set { alignment_and_ref }  
+
+        if (align_method == "SEMANTIC"{
+            EVAL_SEMANTIC(flavour, alignment_and_ref, align_method, tree_method, bucket_size)
+
+            tcScore = EVAL_SEMANTIC.out.tcScore
+            spScore = EVAL_SEMANTIC.out.spScore
+            colScore = EVAL_SEMANTIC.out.colScore
+
+        }
+
 
         if (align_method == "CLUSTALO"){
             EVAL_CLUSTALO(flavour, alignment_and_ref, align_method, tree_method, bucket_size)
