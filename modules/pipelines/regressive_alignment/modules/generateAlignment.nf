@@ -5,7 +5,7 @@ include { set_templates_path } from './functions.nf'
 path_templates = set_templates_path()
 
 process SEMANTIC_ALIGNER {
-    ///container 'cbcrg/tcoffee@sha256:d249920bffdf9645bebac06225e13ee4407dc7410c60380ff51a8479325cd11f'
+
     tag "semantic on $id"
     publishDir "${params.outdir}/alignments", pattern: '*.aln'
 
@@ -18,6 +18,7 @@ process SEMANTIC_ALIGNER {
     path ".command.trace", emit: metricFile
 
     script:    
+
     template "${path_templates}/semantic_align/semantic.sh"        
 }
 
