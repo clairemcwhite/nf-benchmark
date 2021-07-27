@@ -14,7 +14,7 @@ process SEMANTIC_ALIGNER {
 
     output:
     //val align_method, emit: alignMethod
-    tuple val (id), path ("${id}.semantic.*.aln"), emit: alignmentFile
+    tuple val (id), path ("${id}.semantic.aln"), emit: alignmentFile
     path ".command.trace", emit: metricFile
 
     script:    
@@ -31,7 +31,7 @@ process REG_ALIGNER {
     //publishDir "${params.outdir}/templates", pattern: '*.prf'
 
     input:
-    tuple val(id), val(tree_method), file(seqs), file(guide_tree), file(template), file(library)
+    tuple val(id), val(tree_method), file(seqs), file(guide_tree)//, file(template), file(library)
     each align_method
     each bucket_size
 
@@ -101,7 +101,7 @@ process TCOFFEE_ALIGNER {
     //publishDir "${params.cache_path}", pattern: '*.aln'
 
     input:
-    tuple val(id), val(tree_method), file(seqs), file(guide_tree), file(template), file(library)
+    tuple val(id), val(tree_method), file(seqs), file(guide_tree) //, file(template), file(library)
     each tc_mode         
 
     output:
